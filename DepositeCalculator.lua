@@ -17,9 +17,8 @@ local settings = inicfg.load({
 		my_vip = 0,
 		my_insurance = 0,
 		my_lavka = 0,
-		fix = 22.5
-    },
-	
+		fix = -5.791
+    }
 }, my_ini)
 
 if MONET_DPI_SCALE == nil then MONET_DPI_SCALE = 1.0 end
@@ -36,7 +35,6 @@ local my_rank = new.int(settings.general.my_rank)
 local input_fix = new.char[256](u8(settings.general.fix))
 
 local sizeX, sizeY = getScreenResolution()
-
 
 local check_stats = false
 
