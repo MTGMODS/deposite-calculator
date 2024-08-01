@@ -421,56 +421,55 @@ function getPercentBonus()
 
 end
 function getDeposite()
-    local status, result = pcall(function()
-        local deposite = getMyDeposite()
 
-        if tonumber(deposite) > getMaxDeposite() then
-            deposite = getMaxDeposite()
-        end
+	local deposite = getMyDeposite()
 
-        local my_deposite = deposite / getVipProfit()
-        local my_deposite_prefinal = my_deposite + (my_deposite / 100) * getPercentBonus()
+	if tonumber(deposite) > getMaxDeposite() then
+		deposite = getMaxDeposite()
+	end
 
-        local deposite_fix = ( my_deposite_prefinal / 100 ) * tonumber(settings.general.fix)
+	local my_deposite = deposite / getVipProfit()
+	local my_deposite_prefinal = my_deposite + (my_deposite / 100) * getPercentBonus()
 
-        local final_deposite = my_deposite_prefinal - deposite_fix
+	local deposite_fix = 0
+	pcall(function()
+		deposite_fix = ( my_deposite_prefinal / 100 ) * tonumber(settings.general.fix)
+	end)
+	
+	local final_deposite = my_deposite_prefinal - deposite_fix
 
-        return math.floor(final_deposite/2)
-    end)
-
-    if not status then
-        return 0
-    else
-        return result
-    end
+	return math.floor(final_deposite/2)
 end
 function gotoFullDeposite()
 
 	local currentDeposit = getMyDeposite()
 
-    if currentDeposit >= getMaxDeposite() then
-        return
-    end
+	if currentDeposit >= getMaxDeposite() then
+		return 0
+	end
 
-    local iterations = 0
+	local iterations = 0
 
-    while currentDeposit < getMaxDeposite() do
+	while currentDeposit < getMaxDeposite() do
 	
-        local my_deposite = currentDeposit / getVipProfit()
+		local my_deposite = currentDeposit / getVipProfit()
 		
-        local my_deposite_bonus = my_deposite + (my_deposite / 100) * getPercentBonus()
+		local my_deposite_bonus = my_deposite + (my_deposite / 100) * getPercentBonus()
 		
-        local final_deposite = my_deposite_bonus - (my_deposite_bonus / 100) * tonumber(settings.general.fix)
+		local deposite_fix = 0
+		pcall(function()
+			deposite_fix = ( my_deposite_bonusl / 100 ) * tonumber(settings.general.fix)
+		end)
 
-		final_deposite = math.floor(final_deposite/2)	
+		local final_deposite = math.floor((my_deposite_bonus - deposite_fix)/2)
 		
 		currentDeposit = currentDeposit + final_deposite
 		
-        iterations = iterations + 1
+		iterations = iterations + 1
 		
-    end
+	end
 
-    return iterations
+	return iterations
 end
 function comma_value(n) -- эта функция полностю взята со скрипта MoneySeparator by Royan_Millans and YarikVL
 	local left,num,right = string.match(n,'^([^%d]*%d)(%d*)(.-)$')
