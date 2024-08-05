@@ -17,6 +17,7 @@ local settings = inicfg.load({
 		my_vip = 0,
 		my_insurance = 0,
 		my_lavka = 0,
+		my_gramota = 0,
 		fix = -5.791
     }
 }, my_ini)
@@ -29,6 +30,7 @@ local new = imgui.new
 local MainWindow  = new.bool()
 local my_insurance = new.int(settings.general.my_insurance)
 local my_lavka = new.int(settings.general.my_lavka)
+local my_gramota = new.int(settings.general.my_gramota)
 local my_houses = new.int(settings.general.my_houses)
 local my_vip = new.int(settings.general.my_vip)
 local my_rank = new.int(settings.general.my_rank)
@@ -128,7 +130,7 @@ imgui.OnFrame(
     function(opyat_govnokog_exx)
 	
 		imgui.SetNextWindowPos(imgui.ImVec2(sizeX / 2, sizeY / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-		imgui.SetNextWindowSize(imgui.ImVec2(800 * MONET_DPI_SCALE, 442 * MONET_DPI_SCALE), imgui.Cond.FirstUseEver)
+		imgui.SetNextWindowSize(imgui.ImVec2(800 * MONET_DPI_SCALE, 475 * MONET_DPI_SCALE), imgui.Cond.FirstUseEver)
 		imgui.Begin(fa.LANDMARK.." Deposite Caclulator by MTG MODS", MainWindow, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 		
 		if imgui.BeginChild('##1', imgui.ImVec2(790 * MONET_DPI_SCALE, 65 * MONET_DPI_SCALE), true) then
@@ -180,7 +182,7 @@ imgui.OnFrame(
 		
 		imgui.EndChild() end
 		
-		if imgui.BeginChild('##3', imgui.ImVec2(790 * MONET_DPI_SCALE, 230 * MONET_DPI_SCALE), true) then
+		if imgui.BeginChild('##3', imgui.ImVec2(790 * MONET_DPI_SCALE, 265 * MONET_DPI_SCALE), true) then
 			
 			imgui.CenterText(fa.CIRCLE_INFO .. u8' Укажите ваши условия, которые влияют на прибыль с депозита:')
 			
@@ -337,6 +339,45 @@ imgui.OnFrame(
 		
 			imgui.Separator()
 			
+			if imgui.CollapsingHeader(fa.FILE .. u8' Наличие у вас "Грамоты Ветерана"') then
+				imgui.PushItemWidth(50 * MONET_DPI_SCALE)
+				imgui.SetCursorPosX(imgui.GetWindowWidth() / 2 - 25 * MONET_DPI_SCALE)
+				local numButtons = 2
+				local buttonWidth = 100 * MONET_DPI_SCALE
+				local totalButtonWidth = buttonWidth * numButtons + imgui.GetStyle().ItemSpacing.x * (numButtons - 1)
+				local startPosX = (imgui.GetWindowWidth() - totalButtonWidth) / 2
+				imgui.SetCursorPosX(startPosX)
+				for i = 0, numButtons - 1 do
+					if i > 0 then
+						imgui.SameLine()
+					end
+					local label
+					if i == 0 then
+						label = u8' Нету ##my_gramota' 
+					elseif i == 1 then
+						label = u8' Есть ##my_gramota'
+					end
+
+					imgui.SetCursorPosX(startPosX + i * (buttonWidth + imgui.GetStyle().ItemSpacing.x))
+					if imgui.RadioButtonIntPtr(label, my_gramota, i) then
+						my_gramota[0] = i
+						if my_gramota[0] == 0 then
+							settings.general.my_gramota = false
+							inicfg.save(settings, my_ini)
+						else
+							settings.general.my_gramota = true
+							inicfg.save(settings, my_ini)
+						end
+					end
+				end
+				imgui.Separator()
+			end
+			if imgui.IsItemHovered() then
+				imgui.SetTooltip(u8'Грамота ветерана выдаётся за 400 отыганных часов в армиях\nДаёт такие бонусы:\n1. +11 процентов к зп во фракции\n2. +5 процентов к зп на любой работе (ЦЗ)\n3. +7 процентов к депозиту')
+			end
+
+			imgui.Separator()
+			
 			if imgui.CollapsingHeader(fa.CIRCLE_DOLLAR_TO_SLOT .. u8' Текущий процент фикса экономики') then
 				imgui.PushItemWidth(50 * MONET_DPI_SCALE)
 				imgui.SetCursorPosX(imgui.GetWindowWidth() / 2 - 25 * MONET_DPI_SCALE)
@@ -415,6 +456,10 @@ function getPercentBonus()
 
 	if my_lavka[0] == 1 then
 		percent = percent + 12
+	end
+
+	if my_gramota[0] == 1 then
+		percent = percent + 7
 	end
 	
 	return tonumber(percent)
